@@ -1,0 +1,6 @@
+name: "PuffTower"
+entrypoint: "com.github.zimablue.pufftower.PuffTower"
+# the package for annotations scan
+packageName: "com.github.zimablue.pufftower"
+
+version: "1.0-SNAPSHOT"
