@@ -24,12 +24,12 @@ class TowerGame(override val team: Team) : Dungeon() {
         TODO()
     }
 
-    fun setupNextFloor() {
+    fun setupNextFloor(floorConfig: FloorConfig) : TowerFloorDungeon {
         //todo setup the next floor dungeon( select floor config, calling init )
         TODO()
     }
 
-    fun toNextFloor() {
+    fun toNextFloor(floorConfig: FloorConfig) : TowerFloorDungeon {
         //todo setup next floor, call onStart of the next floor
         TODO()
     }
