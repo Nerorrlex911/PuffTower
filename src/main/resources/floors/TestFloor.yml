@@ -1,0 +1,11 @@
+TestFloor:
+  mapPath: maps/TestFloor.polar
+  spawnPosition: [0,0,0]
+  generators:
+    - TestGenerator
+    - JSGenerator
+  onStart: "TestFloor.js::onStart"
+  onEnd: "TestFloor.js::onEnd"
+  onShutdown: "TestFloor.js::onShutdown"
+  features:
+    - TestFeature

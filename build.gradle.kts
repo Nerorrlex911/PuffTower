@@ -6,12 +6,15 @@ group = "com.github.zimablue.pufftower"
 version = "1.0-SNAPSHOT"
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
     testImplementation(kotlin("test"))
     compileOnly(fileTree("libs"))
+    compileOnly("com.github.zimablue.devoutserver:DevoutServer:1.0-SNAPSHOT")
+    implementation("dev.hollowcube:polar:1.14.7")
 }
 
 tasks.test {

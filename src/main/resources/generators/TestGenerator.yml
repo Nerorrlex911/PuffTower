@@ -1,0 +1,12 @@
+TestGenerator:
+  type: base
+  mob: Zombie
+  chance: 0.5
+  positions:
+   - [0, 0, 0]
+   - [1, 0, 0]
+  conditions: |-
+    return this.team.captain.getHealth() < 10;
+JSGenerator:
+  type: js
+  run: "JSGenerator.js::generate"

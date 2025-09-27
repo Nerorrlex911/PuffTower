@@ -1,0 +1,17 @@
+# the lobby of all dungeons
+# the place where players leave the dungeon
+# could be overridden by listening to the DungeonLeaveEvent
+lobby:
+  instance: "testLobby"
+  position: [0, 0, 0]
+lounge:
+  path: "maps/lounge.polar"
+  position: [0,0,0]
+towerGame:
+  floors:
+    - - Floor1-1
+      - Floor1-2
+      - Floor1-3
+    - - Floor2-1
+      - Floor2-2
+      - Floor2-3
