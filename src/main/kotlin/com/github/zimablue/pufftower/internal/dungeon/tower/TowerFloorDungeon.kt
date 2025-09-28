@@ -17,7 +17,7 @@ import kotlin.time.Duration
  * @param floorConfig the configuration of this floor
  * @param towerGame the game of the tower this floor belongs to
  */
-class TowerFloorDungeon(private val floorConfig: FloorConfig, private val towerGame: TowerGame): SingleInstanceDungeon() {
+class TowerFloorDungeon(val floorConfig: FloorConfig, val towerGame: TowerGame): SingleInstanceDungeon() {
 
     override val team: Team = towerGame.team
 
@@ -40,11 +40,11 @@ class TowerFloorDungeon(private val floorConfig: FloorConfig, private val towerG
     override suspend fun init() {
         super.init()
         // generates mobs
-        floorConfig.generators.forEach { generator ->
-            // generators should set the entity to proper position and instance
-            // we don't care about the result so no need to suspend
-            generator.generate(this)
-        }
+//        floorConfig.generators.forEach { generator ->
+//            // generators should set the entity to proper position and instance
+//            // we don't care about the result so no need to suspend
+//            generator.generate(this)
+//        }
         TODO()
     }
 
