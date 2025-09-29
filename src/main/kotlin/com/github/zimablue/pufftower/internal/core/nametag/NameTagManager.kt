@@ -1,24 +1,25 @@
-package com.github.zimablue.pufftower.internal.nametag
+package com.github.zimablue.pufftower.internal.core.nametag
 
+import com.github.zimablue.devoutserver.plugin.lifecycle.Awake
+import com.github.zimablue.devoutserver.plugin.lifecycle.PluginLifeCycle
+import com.github.zimablue.pufftower.PuffTower
+import net.kyori.adventure.text.Component
 import net.minestom.server.MinecraftServer
 import net.minestom.server.entity.Entity
-import net.minestom.server.entity.EntityType
 import net.minestom.server.entity.Player
 import net.minestom.server.event.Event
 import net.minestom.server.event.EventListener
 import net.minestom.server.event.EventNode
+import net.minestom.server.event.entity.EntityDeathEvent
 import net.minestom.server.event.entity.EntityDespawnEvent
 import net.minestom.server.event.entity.EntitySpawnEvent
 import net.minestom.server.event.player.PlayerRespawnEvent
 import net.minestom.server.network.packet.server.play.SetPassengersPacket
-import net.minestom.server.network.packet.server.play.TeamsPacket
-import net.minestom.server.scoreboard.Team
 import net.minestom.server.tag.Tag
-import java.util.function.Function
 
 
-class NameTagManager(node: EventNode<Event>, private val teamCallback: Function<Entity, Team>) {
-    init {
+object NameTagManager {
+    private fun init(node: EventNode<Event>) {
         val respawnListener = EventListener.builder(
             PlayerRespawnEvent::class.java
         )
@@ -59,6 +60,15 @@ class NameTagManager(node: EventNode<Event>, private val teamCallback: Function<
             }
             .build()
         node.addListener(despawnListener)
+        val deathListener = EventListener.builder(
+            EntityDeathEvent::class.java
+        )
+            .handler{ event ->
+                val entity = event.entity
+                if (hasNameTag(entity)) entity.getTag(NAME_TAG).remove()
+            }
+            .build()
+        node.addListener(deathListener)
     }
 
     /**
@@ -78,52 +88,40 @@ class NameTagManager(node: EventNode<Event>, private val teamCallback: Function<
         return null
     }
 
-    /**
-     * Creates a nametag for the provided entity and automatically keeps it attached.
-     *
-     * @param entity the entity to create a nametag for
-     * @param transparentBackground whether the background of the nametag should be transparent or not
-     * @return the created nametag for the entity, or current nametag if it already exists
-     */
-    /**
-     * Creates a nametag for the provided entity with a transparent background and automatically keeps it attached.
-     *
-     * @param entity the entity to create a nametag for
-     * @return the created nametag for the entity, or current nametag if it already exists
-     */
-    @JvmOverloads  // getNameTag() can't be null here due to hasNameTag check
-    fun createNameTag(entity: Entity, transparentBackground: Boolean = true): NameTag {
-        if (hasNameTag(entity)) return getNameTag(entity)!!
-        val nameTag = NameTag(entity, transparentBackground)
+    fun createNameTag(entity: Entity): NameTag {
+        val nameTag = NameTag()
         entity.setTag(NAME_TAG, nameTag)
-        val nameTagTeam = teamCallback.apply(entity)
-        nameTagTeam.nameTagVisibility = TeamsPacket.NameTagVisibility.NEVER
-        if (entity.entityType === EntityType.PLAYER) {
-            if (entity is Player) nameTagTeam.addMember(entity.username)
-            else if (entity.hasTag(USERNAME_TAG)) nameTagTeam.addMember(entity.getTag(USERNAME_TAG))
-        } else nameTagTeam.addMember(entity.uuid.toString())
         return nameTag
     }
 
-    companion object {
-        private val NAME_TAG: Tag<NameTag> = Tag.Transient("msnametags.name-tag")
-
-        /**
-         * Tag to be set on entities which type is a player, so it can be properly added to its team.
-         */
-        val USERNAME_TAG: Tag<String> = Tag.String("msnametags-username")
-
-        /**
-         * [Entity.getPassengersPacket]
-         *
-         * @param entity the entity to get the passengers of
-         * @return passengers packet of the provided entity
-         */
-        fun getPassengersPacket(entity: Entity): SetPassengersPacket {
-            return SetPassengersPacket(
-                entity.entityId,
-                entity.passengers.stream().map { obj: Entity -> obj.entityId }.toList()
-            )
+    fun createNameTag(entity: Entity, texts: List<Component>, transparent: Boolean=true):NameTag {
+        val nameTag = createNameTag(entity)
+        texts.forEach {
+            nameTag.add(NameTagText(entity,it,transparent))
         }
+        return nameTag
     }
+
+    private val NAME_TAG: Tag<NameTag> = Tag.Transient("pufftower.name-tag")
+
+    /**
+     * [Entity.getPassengersPacket]
+     *
+     * @param entity the entity to get the passengers of
+     * @return passengers packet of the provided entity
+     */
+    fun getPassengersPacket(entity: Entity): SetPassengersPacket {
+        return SetPassengersPacket(
+            entity.entityId,
+            entity.passengers.stream().map { obj: Entity -> obj.entityId }.toList()
+        )
+    }
+    private val eventNode: EventNode<Event> = EventNode.all("PuffTower-NameTagManager").setPriority(1)
+
+    @Awake(PluginLifeCycle.ENABLE)
+    fun onEnable() {
+        PuffTower.puffTowerEventNode.addChild(eventNode)
+        init(eventNode)
+    }
+
 }

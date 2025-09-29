@@ -1,6 +1,8 @@
-package com.github.zimablue.pufftower.internal.nametag
+package com.github.zimablue.pufftower.internal.core.nametag
 
+import com.github.zimablue.pufftower.internal.manager.PTConfig.debug
 import net.kyori.adventure.text.Component
+import net.minestom.server.component.DataComponents
 import net.minestom.server.coordinate.Point
 import net.minestom.server.coordinate.Vec
 import net.minestom.server.entity.Entity
@@ -10,14 +12,19 @@ import net.minestom.server.entity.metadata.display.AbstractDisplayMeta
 import net.minestom.server.entity.metadata.display.TextDisplayMeta
 
 
-class NameTag internal constructor(
+class NameTagText internal constructor(
     /**
      * @return the owner of this nametag (what this is riding)
      */
-    val owningEntity: Entity, transparentBackground: Boolean
+    val owningEntity: Entity, transparentBackground: Boolean = true
 ) :
     Entity(EntityType.TEXT_DISPLAY) {
     private val textMeta: TextDisplayMeta
+
+    constructor(entity: Entity, text: Component, transparentBackground: Boolean = true)
+            : this(entity,transparentBackground) {
+                this.text = text
+            }
 
     init {
         hasPhysics = false
@@ -83,8 +90,8 @@ class NameTag internal constructor(
     }
 
     /**
-     * Effectively teleports this [NameTag] to the player and mounts it to the player.<br></br>
-     * Used during initialization and called if this [NameTag] isn't in the same
+     * Effectively teleports this [NameTagText] to the player and mounts it to the player.<br></br>
+     * Used during initialization and called if this [NameTagText] isn't in the same
      * [net.minestom.server.instance.Instance] as the owning player.
      */
     fun mount() {
@@ -103,6 +110,6 @@ class NameTag internal constructor(
     }
 
     companion object {
-        private val DEFAULT_TRANSLATION = Vec(0.0, 0.15, 0.0)
+        val DEFAULT_TRANSLATION = Vec(0.0, 0.1, 0.0)
     }
 }
