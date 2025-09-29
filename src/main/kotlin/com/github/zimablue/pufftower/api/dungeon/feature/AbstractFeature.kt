@@ -1,4 +1,4 @@
-package com.github.zimablue.pufftower.internal.dungeon.feature
+package com.github.zimablue.pufftower.api.dungeon.feature
 
 import com.github.zimablue.devoutserver.util.map.component.Registrable
 import com.github.zimablue.pufftower.PuffTower

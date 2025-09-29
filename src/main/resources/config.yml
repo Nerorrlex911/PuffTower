@@ -1,6 +1,8 @@
 # the lobby of all dungeons
 # the place where players leave the dungeon
 # could be overridden by listening to the DungeonLeaveEvent
+options:
+  debug: true
 lobby:
   instance: "testLobby"
   position: [0, 0, 0]

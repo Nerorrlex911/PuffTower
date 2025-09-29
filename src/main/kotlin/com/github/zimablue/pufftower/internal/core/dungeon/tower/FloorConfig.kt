@@ -1,9 +1,9 @@
-package com.github.zimablue.pufftower.internal.dungeon.tower
+package com.github.zimablue.pufftower.internal.core.dungeon.tower
 
 
-import com.github.zimablue.pufftower.internal.dungeon.feature.Feature
-import com.github.zimablue.pufftower.internal.dungeon.tower.generation.Generator
-import com.github.zimablue.pufftower.internal.mob.Mob
+import com.github.zimablue.pufftower.api.dungeon.feature.Feature
+import com.github.zimablue.pufftower.internal.core.dungeon.tower.generation.Generator
+import com.github.zimablue.pufftower.internal.core.mob.Mob
 import net.minestom.server.coordinate.Pos
 import java.nio.file.Path
 

@@ -1,4 +1,4 @@
-package com.github.zimablue.pufftower.internal.dungeon.tower
+package com.github.zimablue.pufftower.internal.core.dungeon.tower
 
 import com.github.zimablue.pufftower.api.dungeon.Dungeon
 import com.github.zimablue.pufftower.api.team.Team
@@ -24,12 +24,12 @@ class TowerGame(override val team: Team) : Dungeon() {
         TODO()
     }
 
-    fun setupNextFloor(floorConfig: FloorConfig) : TowerFloorDungeon {
+    fun setupNextFloor(floorConfig: FloorConfig) : com.github.zimablue.pufftower.internal.core.dungeon.tower.TowerFloorDungeon {
         //todo setup the next floor dungeon( select floor config, calling init )
         TODO()
     }
 
-    fun toNextFloor(floorConfig: FloorConfig) : TowerFloorDungeon {
+    fun toNextFloor(floorConfig: FloorConfig) : com.github.zimablue.pufftower.internal.core.dungeon.tower.TowerFloorDungeon {
         //todo setup next floor, call onStart of the next floor
         TODO()
     }

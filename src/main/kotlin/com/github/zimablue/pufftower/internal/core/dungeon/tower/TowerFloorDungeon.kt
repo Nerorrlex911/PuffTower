@@ -1,8 +1,8 @@
-package com.github.zimablue.pufftower.internal.dungeon.tower
+package com.github.zimablue.pufftower.internal.core.dungeon.tower
 
+import com.github.zimablue.pufftower.api.dungeon.feature.Feature
 import com.github.zimablue.pufftower.api.team.Team
-import com.github.zimablue.pufftower.internal.dungeon.SingleInstanceDungeon
-import com.github.zimablue.pufftower.internal.dungeon.feature.Feature
+import com.github.zimablue.pufftower.internal.core.dungeon.SingleInstanceDungeon
 import com.github.zimablue.pufftower.internal.manager.PTConfig
 import net.hollowcube.polar.PolarLoader
 import net.minestom.server.MinecraftServer
@@ -35,7 +35,7 @@ class TowerFloorDungeon(val floorConfig: FloorConfig, val towerGame: TowerGame):
     }
 
     override val features: List<Feature>
-        get() = DEFAULT_FEATURES+floorConfig.features
+        get() = DEFAULT_FEATURES +floorConfig.features
 
     override suspend fun init() {
         super.init()

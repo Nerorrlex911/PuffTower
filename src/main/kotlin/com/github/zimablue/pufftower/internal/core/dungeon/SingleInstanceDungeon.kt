@@ -1,7 +1,7 @@
-package com.github.zimablue.pufftower.internal.dungeon
+package com.github.zimablue.pufftower.internal.core.dungeon
 
 import com.github.zimablue.pufftower.api.dungeon.Dungeon
-import com.github.zimablue.pufftower.internal.dungeon.feature.Feature
+import com.github.zimablue.pufftower.api.dungeon.feature.Feature
 import com.github.zimablue.pufftower.internal.manager.PTConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
@@ -9,9 +9,7 @@ import kotlinx.coroutines.withContext
 import net.minestom.server.MinecraftServer
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.Player
-import net.minestom.server.event.EventNode
 import net.minestom.server.event.instance.RemoveEntityFromInstanceEvent
-import net.minestom.server.event.trait.InstanceEvent
 import net.minestom.server.instance.Instance
 import java.util.concurrent.CompletableFuture
 

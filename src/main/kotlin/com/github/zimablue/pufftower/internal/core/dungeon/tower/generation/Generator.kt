@@ -1,4 +1,4 @@
-package com.github.zimablue.pufftower.internal.dungeon.tower.generation
+package com.github.zimablue.pufftower.internal.core.dungeon.tower.generation
 
 import kotlin.math.max
 import kotlin.math.min
