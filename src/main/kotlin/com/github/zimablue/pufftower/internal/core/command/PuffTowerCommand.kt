@@ -1,8 +1,11 @@
 package com.github.zimablue.pufftower.internal.core.command
 
+import com.github.zimablue.pufftower.PuffTower
 import com.github.zimablue.pufftower.internal.core.mob.ZombieMob
 import net.minestom.server.coordinate.Pos
+import net.minestom.server.entity.Player
 import net.minestom.server.instance.Instance
+import net.minestom.server.item.ItemStack
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Description
 import revxrsal.commands.annotation.Optional
@@ -27,5 +30,15 @@ class PuffTowerCommand {
         when(mobId) {
             "zombie" -> ZombieMob().setInstance(instance, Pos(pos[0], pos[1], pos[2]))
         }
+    }
+    @Subcommand("item give")
+    @Description("/pufftower item give <itemId> [<player>] - 给一个物品")
+    fun item(
+        actor: MinestomCommandActor,
+        itemId: String, @Optional player: Player=actor.requirePlayer()
+    ) {
+        actor.sender().sendMessage("give item $itemId")
+        val itemStack = PuffTower.itemManager.getItemStack(itemId)?:return
+        player.inventory.addItemStack(itemStack)
     }
 }

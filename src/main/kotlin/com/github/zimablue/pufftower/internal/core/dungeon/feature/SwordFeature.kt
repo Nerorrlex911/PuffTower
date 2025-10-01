@@ -2,10 +2,13 @@ package com.github.zimablue.pufftower.internal.core.dungeon.feature
 
 import com.github.zimablue.pufftower.api.dungeon.feature.AbstractFeature
 import com.github.zimablue.pufftower.api.manager.WeaponManager
-import net.minestom.server.entity.PlayerHand
+import com.github.zimablue.pufftower.util.attack
+import net.minestom.server.entity.LivingEntity
+import net.minestom.server.entity.Player
 import net.minestom.server.event.EventNode
-import net.minestom.server.event.player.PlayerHandAnimationEvent
+import net.minestom.server.event.entity.EntityAttackEvent
 import net.minestom.server.event.trait.InstanceEvent
+import kotlin.math.acos
 
 /**
  * 剑类武器
@@ -13,12 +16,26 @@ import net.minestom.server.event.trait.InstanceEvent
  */
 object SwordFeature : AbstractFeature("sword") {
     override fun hook(node: EventNode<InstanceEvent>) {
-        node.addListener(PlayerHandAnimationEvent::class.java) { event ->
-            if(event.hand != PlayerHand.MAIN) return@addListener
-            val player = event.player
+        node.addListener(EntityAttackEvent::class.java) { event ->
+            val player = event.entity as? Player ?: return@addListener
             val weapon = player.itemInMainHand
             if(weapon.getTag(WeaponManager.ITEM_TYPE)!="sword") return@addListener
+            attack(player,event.target as? LivingEntity ?: return@addListener)
+            player.instance.getNearbyEntities(player.position, 3.0).forEach { entity ->
+                if(entity !is LivingEntity) return@forEach
+                if(entity==event.target) return@forEach
+                //todo should pvp check here?
+                val direction = entity.position.sub(player.position).asVec().normalize()
+                val playerDirection = player.position.direction().normalize()
+                val angle = Math.toDegrees(acos(direction.dot(playerDirection)))
+                if(angle>60) return@forEach
+                attack(player,entity,1.0f)
+            }
         }
+
     }
+
+
+
 
 }

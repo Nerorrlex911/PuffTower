@@ -18,9 +18,9 @@ class ZombieMob : Mob(EntityType.ZOMBIE, "僵尸") {
         )
 
         val movementSpeedAttribute = getAttribute(Attribute.MOVEMENT_SPEED)
-        movementSpeedAttribute.baseValue = 0.23
+        movementSpeedAttribute.baseValue = 0.2
         val healthAttribute = getAttribute(Attribute.MAX_HEALTH)
-        healthAttribute.baseValue = 40.0
+        healthAttribute.baseValue = 20.0
         heal()
     }
 

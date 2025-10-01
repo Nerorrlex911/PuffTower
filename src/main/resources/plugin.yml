@@ -4,3 +4,6 @@ entrypoint: "com.github.zimablue.pufftower.PuffTower"
 packageName: "com.github.zimablue.pufftower"
 
 version: "1.0-SNAPSHOT"
+
+dependencies:
+  - "AttributeSystem"
