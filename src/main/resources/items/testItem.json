@@ -18,5 +18,15 @@
         "saved_by": "ItemSaver.js"
       }
     }
+  },
+  "zombie_egg": {
+    "id": "minecraft:zombie_spawn_egg",
+    "count": 1,
+    "components": {
+      "minecraft:custom_data": {
+        "test": 112,
+        "mob_egg": "zombie"
+      }
+    }
   }
 }

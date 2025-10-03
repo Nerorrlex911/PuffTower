@@ -24,3 +24,13 @@ tasks.test {
 kotlin {
     jvmToolchain(22)
 }
+tasks.jar {
+    doLast {
+        val destinationDir = file("F:\\Code\\MyCode\\MineStom\\Devout\\DevoutServerTest\\plugins") // 替换为目标路径
+        copy {
+            from(archiveFile)
+            into(destinationDir)
+        }
+        println("Jar file copied to $destinationDir")
+    }
+}
