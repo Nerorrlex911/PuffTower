@@ -1,5 +1,6 @@
 package com.github.zimablue.pufftower.util
 
+import com.github.zimablue.attrsystem.api.AttrAPI.getAttrData
 import com.github.zimablue.attrsystem.fight.api.FightAPI
 import com.github.zimablue.attrsystem.fight.api.fight.FightData
 import net.minestom.server.entity.LivingEntity
@@ -27,4 +28,8 @@ fun attack(attacker: LivingEntity, target: LivingEntity, force: Float=1.0f) : Do
         -cos(attacker.position.yaw() * (Math.PI / 180))
     )
     return damage
+}
+
+fun LivingEntity.getAttrValue(name: String, type: String = "total"): Double? {
+    return this.getAttrData()?.getAttrValue(name, type)
 }

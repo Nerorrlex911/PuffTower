@@ -1,15 +1,20 @@
 package com.github.zimablue.pufftower
 
+import com.github.zimablue.attrsystem.AttributeSystem
 import com.github.zimablue.devoutserver.DevoutServer
 import com.github.zimablue.devoutserver.plugin.Plugin
+import com.github.zimablue.devoutserver.plugin.lifecycle.Awake
+import com.github.zimablue.devoutserver.plugin.lifecycle.PluginLifeCycle
 import com.github.zimablue.devoutserver.plugin.script.PluginScriptManager
 import com.github.zimablue.pufftower.api.manager.DungeonManager
 import com.github.zimablue.pufftower.api.manager.FeatureManager
 import com.github.zimablue.pufftower.api.manager.ItemManager
+import com.github.zimablue.pufftower.api.manager.SkillManager
 import com.github.zimablue.pufftower.internal.core.command.PuffTowerCommand
 import com.github.zimablue.pufftower.internal.manager.DungeonManagerImpl
 import com.github.zimablue.pufftower.internal.manager.FeatureManagerImpl
 import com.github.zimablue.pufftower.internal.manager.ItemManagerImpl
+import com.github.zimablue.pufftower.internal.manager.SkillManagerImpl
 import net.minestom.server.MinecraftServer
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.Player
@@ -30,8 +35,14 @@ object PuffTower : Plugin() {
     val featureManager: FeatureManager = FeatureManagerImpl
     val scriptManager: PluginScriptManager = PluginScriptManager(this)
     val itemManager: ItemManager = ItemManagerImpl
+    val skillManager: SkillManager = SkillManagerImpl
 
     lateinit var instance: Instance
+
+    @Awake(PluginLifeCycle.NONE)
+    fun onInit() {
+        AttributeSystem.attributeManager.addSubPlugin(this)
+    }
 
 
     override fun onLoad() {
