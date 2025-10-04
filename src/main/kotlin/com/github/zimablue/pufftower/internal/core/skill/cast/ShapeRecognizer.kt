@@ -7,22 +7,60 @@ data class Pt(val x: Double, val y: Double)
 data class Template(val name: String, val points: List<Pt>)
 
 class ShapeRecognizer(
-    private val squareSize: Double = 250.0,       // 归一化尺度方框大小
-    private val resampleCount: Int = 32,          // 重采样点数（64足够稳定）
-    private val angleRange: Double = Math.PI / 4, // 允许旋转搜索的角范围（±45°）
-    private val anglePrecision: Double = Math.toRadians(2.0), // 搜索精度（2°）
-    private val minScore: Double = 0.60           // 最低可接受得分，低于则认为未知
+    val squareSize: Double = 250.0,       // 归一化尺度方框大小
+    val resampleCount: Int = 32,          // 重采样点数（64足够稳定）
+    val angleRange: Double = Math.PI / 4, // 允许旋转搜索的角范围（±45°）
+    val anglePrecision: Double = Math.toRadians(2.0), // 搜索精度（2°）
+    val minScore: Double = 0.60           // 最低可接受得分，低于则认为未知
 ) {
 
-    private val templates = mutableListOf<Template>()
+    val templates = mutableMapOf<String,Template>()
     private val halfDiagonal = 0.5 * hypot(squareSize, squareSize)
     private val phi = 0.5 * (sqrt(5.0) - 1.0) // 黄金分割常数 ≈ 0.618
 
     init {
         // 预置模板
-        addTemplate("Circle", circleTemplate())
-        addTemplate("Triangle", triangleTemplate())
-        addTemplate("Square", squareTemplate())
+//        addTemplate("Circle", CIRCLE)
+//        addTemplate("Triangle", TRIANGLE)
+//        addTemplate("Square", SQUARE)
+    }
+
+    companion object {
+        // ========= 预置模板 =========
+
+        val CIRCLE:(recognizer: ShapeRecognizer) -> List<Pt> = { recognizer: ShapeRecognizer ->
+            val n = recognizer.resampleCount
+            val r = 100.0
+            val cx = 0.0
+            val cy = 0.0
+            val list = ArrayList<Pt>(n)
+            val total = n - 1 // 闭合
+            for (i in 0..total) {
+                val a = 2.0 * Math.PI * i / total
+                list.add(Pt(cx + r * cos(a), cy + r * sin(a)))
+            }
+            list
+        }
+
+        val TRIANGLE:(recognizer: ShapeRecognizer) -> List<Pt> = { recognizer: ShapeRecognizer ->
+            // 等边三角形，绕边一笔画闭合
+            val s = 200.0
+            val h = s * sqrt(3.0) / 2.0
+            val a = Pt(0.0, -h / 2.0)          // 顶点
+            val b = Pt(s / 2.0, h / 2.0)       // 右下
+            val c = Pt(-s / 2.0, h / 2.0)      // 左下
+            listOf(a, b, c, a)          // 闭合
+        }
+
+        val SQUARE:(recognizer: ShapeRecognizer) -> List<Pt> = { recognizer: ShapeRecognizer ->
+            val s = 200.0
+            val half = s / 2.0
+            val p1 = Pt(-half, -half)
+            val p2 = Pt(half, -half)
+            val p3 = Pt(half, half)
+            val p4 = Pt(-half, half)
+            listOf(p1, p2, p3, p4, p1) // 闭合
+        }
     }
 
     // 对外主接口：输入 List<Pair<Double, Double>>，输出图形类型中文字符串
@@ -37,7 +75,7 @@ class ShapeRecognizer(
         var bestDist = Double.MAX_VALUE
         var bestName = "未知"
 
-        for (tpl in templates) {
+        for ((name,tpl) in templates) {
             val d = distanceAtBestAngle(candidate, tpl.points, -angleRange, angleRange, anglePrecision)
             if (d < bestDist) {
                 bestDist = d
@@ -49,9 +87,19 @@ class ShapeRecognizer(
     }
 
     // 可扩展添加自定义模板（例如五角星等）
-    fun addTemplate(name: String, rawPoints: List<Pt>) {
+    fun addTemplate(name: String, rawPoints: List<Pt>) : ShapeRecognizer{
         val processed = normalize(rawPoints)
-        templates.add(Template(name, processed))
+        templates[name] = Template(name, processed)
+        return this
+    }
+
+    fun addTemplate(name: String, points: (ShapeRecognizer) -> List<Pt>) :ShapeRecognizer {
+        return addTemplate(name, points(this))
+    }
+
+    fun removeTemplate(name: String) : ShapeRecognizer{
+        templates.remove(name)
+        return this
     }
 
     private fun normalize(points: List<Pt>): List<Pt> {
@@ -61,42 +109,6 @@ class ShapeRecognizer(
         pts = scaleToSquare(pts, squareSize)
         pts = translateToOrigin(pts)
         return pts
-    }
-
-    // ========= 预置模板 =========
-
-    private fun circleTemplate(): List<Pt> {
-        val n = resampleCount
-        val r = 100.0
-        val cx = 0.0
-        val cy = 0.0
-        val list = ArrayList<Pt>(n)
-        val total = n - 1 // 闭合
-        for (i in 0..total) {
-            val a = 2.0 * Math.PI * i / total
-            list.add(Pt(cx + r * cos(a), cy + r * sin(a)))
-        }
-        return list
-    }
-
-    private fun triangleTemplate(): List<Pt> {
-        // 等边三角形，绕边一笔画闭合
-        val s = 200.0
-        val h = s * sqrt(3.0) / 2.0
-        val a = Pt(0.0, -h / 2.0)          // 顶点
-        val b = Pt(s / 2.0, h / 2.0)       // 右下
-        val c = Pt(-s / 2.0, h / 2.0)      // 左下
-        return listOf(a, b, c, a)          // 闭合
-    }
-
-    private fun squareTemplate(): List<Pt> {
-        val s = 200.0
-        val half = s / 2.0
-        val p1 = Pt(-half, -half)
-        val p2 = Pt(half, -half)
-        val p3 = Pt(half, half)
-        val p4 = Pt(-half, half)
-        return listOf(p1, p2, p3, p4, p1) // 闭合
     }
 
     // ========= $1 Recognizer核心方法 =========

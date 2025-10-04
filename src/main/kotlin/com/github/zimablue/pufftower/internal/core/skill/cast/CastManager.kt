@@ -17,26 +17,29 @@ import net.minestom.server.network.packet.server.play.ParticlePacket
 import net.minestom.server.particle.Particle
 import net.minestom.server.tag.Tag
 import net.minestom.server.timer.Task
-import net.minestom.server.timer.TaskSchedule
 import net.minestom.server.utils.time.TimeUnit
 
-object ShapeRecognizerTest {
+object CastManager {
+    // 释放技能，检测蓝条等条件
+    fun castSkill(player: Player, skill: String) {
+
+    }
+
     val eventNode = EventNode.all("ShapeRecognizer")
     val shapeData = Tag.Transient<MutableList<Pair<Double,Double>>>("shapeData")
     val isDrawing = Tag.Transient<Boolean>("isDrawing").defaultValue(false)
     val startDirection = Tag.Transient<Vec>("startDirection")
     val shapeRecognizeTask = Tag.Transient<Task>("shapeRecognizeTask")
+
     @Awake(PluginLifeCycle.ENABLE)
     fun onEnable() {
         eventNode.addListener(PlayerBeginItemUseEvent::class.java) { event ->
             val player = event.player
             val item = event.itemStack
-            player.sendMessage("你开始使用物品 ${item.material().name()}")
             if(item.material()!= Material.TRIDENT) return@addListener
             event.itemUseDuration = 60
             player.setTag(isDrawing,true)
             player.setTag(startDirection,player.position.direction().normalize())
-            player.sendMessage("startDirection: ${player.getTag(startDirection)}")
             player.setTag(shapeRecognizeTask, player.scheduler().buildTask {
                 if(player.getTag(isDrawing)) {
                     val data = player.getTag(shapeData)?:let{
@@ -47,7 +50,6 @@ object ShapeRecognizerTest {
                     val startDir = player.getTag(startDirection)!!
                     val currentDir = player.position.direction().normalize()
                     val point = intersectionOnPlane(currentDir,startDir)
-                    PuffTower.logger.info("绘制点: $point; ${player.position.add(point.mul(3.0).add(0.0,player.eyeHeight,0.0))}")
                     // 显示粒子
                     player.sendPacket(ParticlePacket(
                         Particle.END_ROD,
@@ -74,8 +76,7 @@ object ShapeRecognizerTest {
         }
         PuffTower.puffTowerEventNode.addChild(eventNode)
     }
-    fun onStopUseItem(player: Player,item: ItemStack) {
-        player.sendMessage("你停止使用物品 ${item.material().name()}")
+    private fun onStopUseItem(player: Player, item: ItemStack) {
         if(item.material()!= Material.TRIDENT) return
         player.setTag(isDrawing,false)
         player.getTag(shapeRecognizeTask).cancel()
@@ -88,17 +89,16 @@ object ShapeRecognizerTest {
         }
         val recognizer = ShapeRecognizer()
         val shape = recognizer.recognize(data)
-        player.sendMessage("识别结果: $shape")
         player.showTitle(Title.title("§6$shape".colored(),"§7(${data.size} points)".colored()))
         data.clear()
         player.removeTag(shapeData)
         player.removeTag(startDirection)
     }
-    fun intersectionOnPlane(a: Vec, b: Vec): Vec {
+    private fun intersectionOnPlane(a: Vec, b: Vec): Vec {
         return a.mul(b.lengthSquared()/a.dot(b))
     }
 
-    fun planeCoordinates(point: Vec, b: Vec): Pair<Double, Double> {
+    private fun planeCoordinates(point: Vec, b: Vec): Pair<Double, Double> {
         // 构造平面上的两个正交基
         val n = b.normalize()
         val u = if (n.x != 0.0 || n.y != 0.0) Vec(-n.y, n.x, 0.0).normalize() else Vec(1.0, 0.0, 0.0)
