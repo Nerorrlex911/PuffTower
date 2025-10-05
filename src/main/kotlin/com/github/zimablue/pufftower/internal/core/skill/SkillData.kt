@@ -24,9 +24,9 @@ class SkillData(
         return this
     }
 
-    var condition: SkillData.() -> Boolean = { true }
+    var condition: (SkillData, Target) -> Boolean = { _,_ -> true }
 
-    fun condition(callback: SkillData.() -> Boolean) : SkillData {
+    fun condition(callback: (SkillData, Target) -> Boolean) : SkillData {
         condition = callback
         return this
     }
@@ -46,7 +46,7 @@ class SkillData(
     }
     
     fun execute() : SkillResult {
-        val check = condition(this)
+        val check = condition(this,Target(entityTarget = caster))
         if(!check) return SkillResult.FAILED
         val targets = selector(this).filter { targetCondition(this,it) }
         return skill(withTargets(targets))

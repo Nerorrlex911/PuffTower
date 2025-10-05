@@ -17,8 +17,3 @@ towerGame:
     - - Floor2-1
       - Floor2-2
       - Floor2-3
-
-execute:
-  - skill: test
-    condition: test2
-    selector: test3

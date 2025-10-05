@@ -6,18 +6,15 @@ import com.github.zimablue.devoutserver.plugin.Plugin
 import com.github.zimablue.devoutserver.plugin.lifecycle.Awake
 import com.github.zimablue.devoutserver.plugin.lifecycle.PluginLifeCycle
 import com.github.zimablue.devoutserver.plugin.script.PluginScriptManager
-import com.github.zimablue.pufftower.api.dungeon.feature.Feature
 import com.github.zimablue.pufftower.api.manager.*
-import com.github.zimablue.pufftower.api.team.Team
 import com.github.zimablue.pufftower.internal.core.command.PuffTowerCommand
-import com.github.zimablue.pufftower.internal.core.dungeon.SingleInstanceDungeon
 import com.github.zimablue.pufftower.internal.manager.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import net.minestom.server.MinecraftServer
 import net.minestom.server.coordinate.Pos
+import net.minestom.server.entity.Entity
+import net.minestom.server.entity.EntityType
 import net.minestom.server.entity.Player
+import net.minestom.server.entity.metadata.other.LightningBoltMeta
 import net.minestom.server.event.EventNode
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent
 import net.minestom.server.instance.Instance
@@ -26,7 +23,6 @@ import net.minestom.server.instance.anvil.AnvilLoader
 import net.minestom.server.instance.block.Block
 import net.minestom.server.instance.generator.GenerationUnit
 import net.minestom.server.utils.chunk.ChunkSupplier
-import kotlin.time.Duration
 
 object PuffTower : Plugin() {
 
@@ -42,14 +38,10 @@ object PuffTower : Plugin() {
 
     lateinit var instance: Instance
 
-    @Awake(PluginLifeCycle.NONE)
-    fun onInit() {
-        AttributeSystem.attributeManager.addSubPlugin(this)
-    }
-
 
     override fun onLoad() {
         super.onLoad()
+        AttributeSystem.attributeManager.addSubPlugin(this)
         scriptManager.init()
     }
 

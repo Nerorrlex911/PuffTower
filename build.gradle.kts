@@ -8,6 +8,7 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenLocal()
     mavenCentral()
+    maven { url = uri("https://reposilite.atlasengine.ca/public")}
 }
 
 dependencies {
@@ -16,6 +17,7 @@ dependencies {
     compileOnly("com.github.zimablue.devoutserver:DevoutServer:1.0-SNAPSHOT")
     compileOnly("com.github.zimablue.attrsystem:AttributeSystem-Minestom:1.0-SNAPSHOT")
     implementation("dev.hollowcube:polar:1.14.7")
+    implementation("ca.atlasengine:atlas-projectiles:2.1.5")
 }
 
 tasks.test {

@@ -22,7 +22,11 @@ import net.minestom.server.utils.time.TimeUnit
 object CastManager {
     // 释放技能，检测蓝条等条件
     fun castSkill(player: Player, skill: String) {
+        when(skill) {
+            "wind_cut" -> {
 
+            }
+        }
     }
 
     val eventNode = EventNode.all("ShapeRecognizer")

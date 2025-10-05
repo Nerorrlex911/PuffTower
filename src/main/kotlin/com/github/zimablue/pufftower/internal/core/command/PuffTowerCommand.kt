@@ -2,10 +2,10 @@ package com.github.zimablue.pufftower.internal.core.command
 
 import com.github.zimablue.pufftower.PuffTower
 import com.github.zimablue.pufftower.internal.core.mob.ZombieMob
+import com.github.zimablue.pufftower.util.EffectUtil.playThunder
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.Player
 import net.minestom.server.instance.Instance
-import net.minestom.server.item.ItemStack
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Description
 import revxrsal.commands.annotation.Optional
@@ -40,5 +40,13 @@ class PuffTowerCommand {
         actor.sender().sendMessage("give item $itemId")
         val itemStack = PuffTower.itemManager.getItemStack(itemId)?:return
         player.inventory.addItemStack(itemStack)
+    }
+
+    @Subcommand("test")
+    @Description("/pufftower test")
+    fun test(actor: MinestomCommandActor,) {
+        actor.sender().sendMessage("test test")
+        val player = actor.requirePlayer()
+        playThunder(player.instance,player.position.add(1.0, 0.0, 1.0),sound = false)
     }
 }
