@@ -18,10 +18,12 @@ abstract class WeaponFeature(key: String,vararg weaponTypes: String): AbstractFe
             val player = event.entity as? Player ?: return@addListener
             val weapon = player.itemInMainHand
             if (hasCooldown(player)) return@addListener
-            val itemType = weapon.itemType
+            val itemType = weapon.itemType?: return@addListener
             if (!itemTypes.contains(itemType)) return@addListener
             val cooldown = weapon.getTag(COOLDOWN_TAG)
-            if(onAttack(event) && cooldown!=null) setCooldown(player,cooldown.clong)
+            if(onAttack(event,itemType) && cooldown!=null) {
+                setCooldown(player, cooldown.clong)
+            }
         }
     }
     fun hasCooldown(player: Player): Boolean {
@@ -30,7 +32,7 @@ abstract class WeaponFeature(key: String,vararg weaponTypes: String): AbstractFe
     fun setCooldown(player: Player, cooldown: Long) {
         PuffTower.cooldownManager.setCooldown(player, "weapon", cooldown)
     }
-    fun onAttack(event: EntityAttackEvent) : Boolean {
+    open fun onAttack(event: EntityAttackEvent,itemType: String) : Boolean {
         return false
     }
 }

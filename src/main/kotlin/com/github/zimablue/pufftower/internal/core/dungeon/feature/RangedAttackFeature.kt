@@ -20,30 +20,25 @@ import kotlin.math.sin
 /*
 AOE攻击，攻击以目标为球心，一定范围的怪物, 伤害随距离衰减
  */
-object RangedAttackFeature : AbstractFeature("ranged") {
-    override fun hook(node: EventNode<InstanceEvent>) {
-        node.addListener(EntityAttackEvent::class.java) { event ->
-            val player = event.entity as? Player ?: return@addListener
-            val weapon = player.itemInMainHand
-            if(PuffTower.cooldownManager.hasCooldown(player,"weapon")) return@addListener
-            val itemType = weapon.itemType
-            if(itemType != "hammer") return@addListener
-            val baseRange = 4.5
-            val range = baseRange*(player.getAttrValue("AttackRange")?:100.0)/100
-            val target = event.target as? LivingEntity ?: return@addListener
-            attack(player,target,1.0f)
-            rangedEffect(target,range)
-            player.instance.getNearbyEntities(target.position, range).forEach { entity ->
-                if(entity !is LivingEntity) return@forEach
-                // 排除当前目标和自己
-                if(entity==event.target) return@forEach
-                if(entity==player) return@forEach
-                val distance = entity.getDistance(player)
-                if(distance > range) return@forEach
-                val force = calcForce(distance, range).toFloat()
-                attack(player,entity,force)
-            }
+object RangedAttackFeature : WeaponFeature("ranged","hammer") {
+    override fun onAttack(event: EntityAttackEvent, itemType: String): Boolean {
+        val player = event.entity as Player
+        val baseRange = 4.5
+        val range = baseRange*(player.getAttrValue("AttackRange")?:100.0)/100
+        val target = event.target as? LivingEntity ?: return false
+        attack(player,target,1.0f)
+        rangedEffect(target,range)
+        player.instance.getNearbyEntities(target.position, range).forEach { entity ->
+            if(entity !is LivingEntity) return@forEach
+            // 排除当前目标和自己
+            if(entity==event.target) return@forEach
+            if(entity==player) return@forEach
+            val distance = entity.getDistance(player)
+            if(distance > range) return@forEach
+            val force = calcForce(distance, range).toFloat()
+            attack(player,entity,force)
         }
+        return true
     }
 
     private fun calcForce(distance:Double, range:Double):Double {
