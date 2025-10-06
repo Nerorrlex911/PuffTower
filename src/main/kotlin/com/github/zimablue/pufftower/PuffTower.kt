@@ -35,6 +35,7 @@ object PuffTower : Plugin() {
     val skillManager: SkillManager = SkillManagerImpl
     val selectorManager: SelectorManager = SelectorManagerImpl
     val conditionManager: ConditionManager = ConditionManagerImpl
+    val cooldownManager: CooldownManager = CooldownManagerImpl
 
     lateinit var instance: Instance
 

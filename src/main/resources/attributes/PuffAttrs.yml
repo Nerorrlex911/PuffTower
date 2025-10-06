@@ -24,6 +24,6 @@
 #    attributes:
 #      - "移动速度: {{<total> * 10}}"
 
-SweepRange:
+AttackRange:
   names:
-    - "横扫范围"
+    - "攻击范围"
