@@ -1,16 +1,11 @@
 package com.github.zimablue.pufftower.internal.core.dungeon.feature
 
-import com.github.zimablue.pufftower.PuffTower
-import com.github.zimablue.pufftower.api.dungeon.feature.AbstractFeature
-import com.github.zimablue.pufftower.api.manager.WeaponManager.Companion.itemType
 import com.github.zimablue.pufftower.util.attack
 import com.github.zimablue.pufftower.util.getAttrValue
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.LivingEntity
 import net.minestom.server.entity.Player
-import net.minestom.server.event.EventNode
 import net.minestom.server.event.entity.EntityAttackEvent
-import net.minestom.server.event.trait.InstanceEvent
 import net.minestom.server.network.packet.server.SendablePacket
 import net.minestom.server.network.packet.server.play.ParticlePacket
 import net.minestom.server.particle.Particle

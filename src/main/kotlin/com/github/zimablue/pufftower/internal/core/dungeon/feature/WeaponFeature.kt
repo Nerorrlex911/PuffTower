@@ -7,6 +7,7 @@ import net.minestom.server.entity.Player
 import net.minestom.server.event.EventNode
 import net.minestom.server.event.entity.EntityAttackEvent
 import net.minestom.server.event.trait.InstanceEvent
+import net.minestom.server.item.ItemStack
 import net.minestom.server.tag.Tag
 import taboolib.common5.clong
 
@@ -20,11 +21,15 @@ abstract class WeaponFeature(key: String,vararg weaponTypes: String): AbstractFe
             if (hasCooldown(player)) return@addListener
             val itemType = weapon.itemType?: return@addListener
             if (!itemTypes.contains(itemType)) return@addListener
-            val cooldown = weapon.getTag(COOLDOWN_TAG)
+            val cooldown = weapon.getItemCooldown()
             if(onAttack(event,itemType) && cooldown!=null) {
                 setCooldown(player, cooldown.clong)
             }
         }
+    }
+    fun ItemStack.getItemCooldown() = this.getTag(COOLDOWN_TAG)
+    fun getCooldown(player: Player): Long {
+        return PuffTower.cooldownManager.getCooldown(player, "weapon")
     }
     fun hasCooldown(player: Player): Boolean {
         return PuffTower.cooldownManager.hasCooldown(player, "weapon")
