@@ -3,18 +3,13 @@ package com.github.zimablue.pufftower
 import com.github.zimablue.attrsystem.AttributeSystem
 import com.github.zimablue.devoutserver.DevoutServer
 import com.github.zimablue.devoutserver.plugin.Plugin
-import com.github.zimablue.devoutserver.plugin.lifecycle.Awake
-import com.github.zimablue.devoutserver.plugin.lifecycle.PluginLifeCycle
 import com.github.zimablue.devoutserver.plugin.script.PluginScriptManager
 import com.github.zimablue.pufftower.api.manager.*
 import com.github.zimablue.pufftower.internal.core.command.PuffTowerCommand
 import com.github.zimablue.pufftower.internal.manager.*
 import net.minestom.server.MinecraftServer
 import net.minestom.server.coordinate.Pos
-import net.minestom.server.entity.Entity
-import net.minestom.server.entity.EntityType
 import net.minestom.server.entity.Player
-import net.minestom.server.entity.metadata.other.LightningBoltMeta
 import net.minestom.server.event.EventNode
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent
 import net.minestom.server.instance.Instance
@@ -77,40 +72,7 @@ object PuffTower : Plugin() {
                 event.spawningInstance = instanceContainer
                 player.respawnPoint = Pos(0.0, 42.0, 0.0)
             }
-//            .addListener(EntityTickEvent::class.java) { event ->
-//                val entity = event.entity
-//                if(!entity.hasVelocity()) return@addListener
-//                if(entity !is EntityCreature) return@addListener
-//                if(!entity.hasEntityCollision()) return@addListener
-//                entity.instance.getNearbyEntities(
-//                    entity.position,
-//                    max(entity.boundingBox.width(),entity.boundingBox.depth())+1.0
-//                ).forEach { entityToCollide ->
-//                    if(entityToCollide !is EntityCreature) return@forEach
-//                    if(entityToCollide==event.entity) return@forEach
-//                    if(entity.intersectEntity(entity.position, entityToCollide)) {
-//                        logger.info("entity collision: ${entity.uuid} -> ${entityToCollide.uuid}")
-//                        // push the other entity away
-//                        val vec = entityToCollide.position.sub(entity.position).asVec()
-//                        val extraVelocity = Vec(max(vec.x,0.1),max(vec.z,0.1)).normalize().mul(5.0)
-//                        entityToCollide.velocity = entityToCollide.velocity.add(extraVelocity)
-//                        logger.info("entity velocity: + $extraVelocity")
-//                    }
-//                }
-//                val result = CollisionUtils.checkEntityCollisions(
-//                    entity,
-//                    entity.velocity,
-//                    1.15,
-//                    { collide: Entity -> collide != entity },
-//                    null
-//                )
-//                for(collisionResult in result) {
-//                    logger.info("collision: ${collisionResult.entity.uuid} dir:${collisionResult.direction} percent:${collisionResult.percentage}")
-//                    val extraVelocity = collisionResult.direction.normalize().mul(collisionResult.percentage*3)
-//                    collisionResult.entity.velocity = collisionResult.entity.velocity.sub(extraVelocity)
-//                }
 
-//            }
         // features testing
         featureManager.forEach { id, feat ->
             logger.info("feature: $id loaded to basic instance")

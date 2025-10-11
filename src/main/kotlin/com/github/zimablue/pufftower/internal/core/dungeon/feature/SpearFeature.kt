@@ -1,5 +1,6 @@
 package com.github.zimablue.pufftower.internal.core.dungeon.feature
 
+import com.github.zimablue.pufftower.internal.annotations.AutoRegister
 import com.github.zimablue.pufftower.util.attack
 import com.github.zimablue.pufftower.util.getAttrValue
 import net.minestom.server.collision.CollisionUtils
@@ -10,6 +11,7 @@ import net.minestom.server.entity.Player
 import net.minestom.server.event.entity.EntityAttackEvent
 import java.util.function.Predicate
 
+@AutoRegister
 object SpearFeature : WeaponFeature("spear","spear") {
     override fun onAttack(event: EntityAttackEvent, itemType: String): Boolean {
         val player = event.entity as Player

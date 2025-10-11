@@ -1,5 +1,6 @@
 package com.github.zimablue.pufftower.internal.core.dungeon.feature
 
+import com.github.zimablue.pufftower.internal.annotations.AutoRegister
 import com.github.zimablue.pufftower.util.attack
 import com.github.zimablue.pufftower.util.getAttrValue
 import net.minestom.server.coordinate.Pos
@@ -15,6 +16,7 @@ import kotlin.math.sin
 /*
 AOE攻击，攻击以目标为球心，一定范围的怪物, 伤害随距离衰减
  */
+@AutoRegister
 object RangedAttackFeature : WeaponFeature("ranged","hammer") {
     override fun onAttack(event: EntityAttackEvent, itemType: String): Boolean {
         val player = event.entity as Player
@@ -43,16 +45,16 @@ object RangedAttackFeature : WeaponFeature("ranged","hammer") {
 
     fun rangedEffect(entity: LivingEntity,range:Double) {
         val particles = mutableListOf<SendablePacket>()
-        for(point in 0..12) {
-            val angle = (point / 12.0) * 2 * Math.PI
+        for(point in 0..24) {
+            val angle = (point / 24.0) * 2 * Math.PI
             val x = cos(angle) * range
             val z = sin(angle) * range
             val particle = ParticlePacket(
                 Particle.END_ROD,
                 entity.position.add(0.0, 0.4, 0.0),
                 Pos(x, 0.0, z),
-                0.3f,
-                1
+                0.2f,
+                0
             )
             particles.add(particle)
         }

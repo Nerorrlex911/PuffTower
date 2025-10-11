@@ -21,6 +21,7 @@ import net.minestom.server.event.entity.EntityDamageEvent
 import net.minestom.server.event.entity.EntityDeathEvent
 import net.minestom.server.event.entity.EntitySpawnEvent
 import kotlin.math.floor
+import kotlin.math.max
 
 open class Mob(entityType: EntityType, val id: String, val name: String) : EntityCreature(entityType) {
 
@@ -86,7 +87,8 @@ open class Mob(entityType: EntityType, val id: String, val name: String) : Entit
                 }
             }.addListener(EntityDamageEvent::class.java) { event ->
                 val mob = event.entity as Mob
-                mob.healthBarTagText.text = generateHealthBar(mob.health-event.damage.amount, mob.getAttributeValue(Attribute.MAX_HEALTH).toFloat())
+                val health = mob.health-event.damage.amount
+                mob.healthBarTagText.text = generateHealthBar(max(health,0.0f), mob.getAttributeValue(Attribute.MAX_HEALTH).toFloat())
             }.addListener(EntityDeathEvent::class.java) { event ->
                 val mob = event.entity as Mob
                 mob.healthBarTagText.text = generateHealthBar(mob.health, 0.0f)
