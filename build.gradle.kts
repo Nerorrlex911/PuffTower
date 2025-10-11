@@ -16,6 +16,7 @@ dependencies {
     compileOnly(fileTree("libs"))
     compileOnly("com.github.zimablue.devoutserver:DevoutServer:1.0-SNAPSHOT")
     compileOnly("com.github.zimablue.attrsystem:AttributeSystem-Minestom:1.0-SNAPSHOT")
+    compileOnly("top.zoyn.particlelib:ParticleLib:1.5.1")
     implementation("dev.hollowcube:polar:1.14.7")
     //implementation("ca.atlasengine:atlas-projectiles:2.1.5")
 }

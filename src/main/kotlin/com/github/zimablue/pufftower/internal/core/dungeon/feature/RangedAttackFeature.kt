@@ -10,6 +10,7 @@ import net.minestom.server.event.entity.EntityAttackEvent
 import net.minestom.server.network.packet.server.SendablePacket
 import net.minestom.server.network.packet.server.play.ParticlePacket
 import net.minestom.server.particle.Particle
+import top.zoyn.particlelib.pobject.Sphere
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -44,21 +45,30 @@ object RangedAttackFeature : WeaponFeature("ranged","hammer") {
     }
 
     fun rangedEffect(entity: LivingEntity,range:Double) {
-        val particles = mutableListOf<SendablePacket>()
-        for(point in 0..24) {
-            val angle = (point / 24.0) * 2 * Math.PI
-            val x = cos(angle) * range
-            val z = sin(angle) * range
-            val particle = ParticlePacket(
+//        val particles = mutableListOf<SendablePacket>()
+//        for(point in 0..24) {
+//            val angle = (point / 24.0) * 2 * Math.PI
+//            val x = cos(angle) * range
+//            val z = sin(angle) * range
+//            val particle = ParticlePacket(
+//                Particle.END_ROD,
+//                entity.position.add(0.0, 0.4, 0.0),
+//                Pos(x, 0.0, z),
+//                0.2f,
+//                0
+//            )
+//            particles.add(particle)
+//        }
+//
+//        entity.viewers.forEach { it.sendPackets(particles) }
+        for (viewer in entity.viewers) {
+            viewer.sendPackets(ParticlePacket(
                 Particle.END_ROD,
                 entity.position.add(0.0, 0.4, 0.0),
-                Pos(x, 0.0, z),
-                0.2f,
-                0
-            )
-            particles.add(particle)
+                Pos.ZERO,
+                (0.3*(1.0+range/4.5)).toFloat(),
+                64
+            ))
         }
-
-        entity.viewers.forEach { it.sendPackets(particles) }
     }
 }
