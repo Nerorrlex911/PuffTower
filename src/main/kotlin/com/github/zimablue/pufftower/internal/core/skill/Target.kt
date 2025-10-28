@@ -2,6 +2,7 @@ package com.github.zimablue.pufftower.internal.core.skill
 
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.Entity
+import net.minestom.server.entity.Player
 
 // Target应当要么是实体目标要么是位置目标，不可以两个都是
 open class Target(
@@ -12,6 +13,7 @@ open class Target(
         get() = entityTarget == null && posTarget == null
 
     val isEntity: Boolean = entityTarget != null
+    val isPlayer: Boolean = entityTarget is Player
     val isPos: Boolean = posTarget != null
 
     fun getPos() = if(entityTarget!=null) entityTarget.position else posTarget

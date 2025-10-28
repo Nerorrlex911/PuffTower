@@ -10,8 +10,12 @@ import net.minestom.server.entity.Player
 import net.minestom.server.event.entity.EntityAttackEvent
 import net.minestom.server.network.packet.server.play.ParticlePacket
 import net.minestom.server.particle.Particle
+import net.minestom.server.tag.Tag
 import net.minestom.server.timer.TaskSchedule
+import net.minestom.server.utils.time.TimeUnit
 import top.zoyn.particlelib.pobject.Arc
+import top.zoyn.particlelib.utils.matrix.Matrixs
+import kotlin.random.Random
 
 /**
  * 横扫类武器
@@ -20,6 +24,7 @@ import top.zoyn.particlelib.pobject.Arc
 @AutoRegister
 //TODO 空挥也应当触发横扫
 object SweepAttackFeature : WeaponFeature("sweep","sword","axe") {
+    val lastAttack = Tag.Boolean("last_attack").defaultValue(true)
     override fun onAttack(event: EntityAttackEvent, itemType: String): Boolean {
         val player = event.entity as Player
         val baseRange = if(itemType=="sword") 3.0 else 4.0
@@ -46,12 +51,19 @@ object SweepAttackFeature : WeaponFeature("sweep","sword","axe") {
 
     fun sweepEffect(player: Player, range: Double) {
         val arc = Arc(
-            player.position.add(0.0, player.eyeHeight, 0.0).add(Vec(-1.5,0.0,0.0).rotateFromView(player.position)),
+            player.position.add(0.0, player.eyeHeight*0.6, 0.0),
             0.0,
-            100.0,
+            150.0,
             range,
-            5.0,
+            7.5,
         )
+        arc.audience = player
+        val rot = 25.0
+        // 添加绕Z轴旋转的矩阵进行倾斜, 添加旋转至玩家面前的矩阵
+        // 此处三元运算用于正负倾斜
+        arc.addMatrix(Matrixs.rotateAroundZAxis(if(player.getTag(lastAttack)) -rot else rot))
+        .addMatrix(Matrixs.rotateAroundYAxis((-player.position.yaw).toDouble()))
+        player.setTag(lastAttack,!player.getTag(lastAttack))
         arc.setParticleSpawner { pos, viewable ->
             val particle = ParticlePacket(
                 Particle.CLOUD,
@@ -60,12 +72,13 @@ object SweepAttackFeature : WeaponFeature("sweep","sword","axe") {
                 0.0f,
                 1
             )
+            player.sendPacket(particle)
             player.viewers.forEach { it.sendPacket(particle) }
         }
         player.scheduler().submitTask {
             if(arc.hasNext()) {
                 arc.playNextPoint()
-                TaskSchedule.nextTick()
+                TaskSchedule.duration(25,TimeUnit.MILLISECOND)
             } else {
                 TaskSchedule.stop()
             }

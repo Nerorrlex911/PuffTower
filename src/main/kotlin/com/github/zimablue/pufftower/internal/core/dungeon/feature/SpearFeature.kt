@@ -15,6 +15,7 @@ import net.minestom.server.event.entity.EntityAttackEvent
 import net.minestom.server.network.packet.server.play.ParticlePacket
 import net.minestom.server.particle.Particle
 import net.minestom.server.timer.TaskSchedule
+import org.checkerframework.checker.nullness.qual.PolyNull
 import top.zoyn.particlelib.pobject.Line
 import java.util.function.Predicate
 
@@ -66,7 +67,7 @@ object SpearFeature : WeaponFeature("spear","spear") {
         val origin = player.position.add(0.0, player.eyeHeight*0.5, 0.0)
         val side = Vec(0.4,0.0,0.0).rotateFromView(player.position)
         val forward = origin.add(Vec(0.0,0.0,1.0).rotateFromView(player.position).mul(range))
-        val particleSpawner = { pos: Point, viewable: Viewable ->
+        val particleSpawner = { pos: Point, _: Player? ->
             for (viewer in entity.viewers) {
                 viewer.sendPacket(ParticlePacket(
                     Particle.END_ROD,

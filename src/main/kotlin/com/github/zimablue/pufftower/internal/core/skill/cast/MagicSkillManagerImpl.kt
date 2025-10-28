@@ -1,9 +1,15 @@
 package com.github.zimablue.pufftower.internal.core.skill.cast
 
+import com.github.zimablue.attrsystem.api.AttrAPI.getAttrData
 import com.github.zimablue.devoutserver.plugin.lifecycle.Awake
 import com.github.zimablue.devoutserver.plugin.lifecycle.PluginLifeCycle
 import com.github.zimablue.devoutserver.util.colored
 import com.github.zimablue.pufftower.PuffTower
+import com.github.zimablue.pufftower.api.manager.MagicSkillManager
+import com.github.zimablue.pufftower.internal.core.skill.SkillData
+import com.github.zimablue.pufftower.internal.core.skill.SkillResult
+import com.github.zimablue.pufftower.internal.core.skill.Target
+import com.github.zimablue.pufftower.util.setTagExpire
 import net.kyori.adventure.title.Title
 import net.minestom.server.coordinate.Vec
 import net.minestom.server.entity.Player
@@ -19,14 +25,22 @@ import net.minestom.server.tag.Tag
 import net.minestom.server.timer.Task
 import net.minestom.server.utils.time.TimeUnit
 
-object CastManager {
-    // 释放技能，检测蓝条等条件
-    fun castSkill(player: Player, skill: String) {
-        when(skill) {
-            "wind_cut" -> {
+object MagicSkillManagerImpl : MagicSkillManager() {
 
-            }
-        }
+    val SKILL_TO_CAST_TAG = Tag.String("skill_to_cast")
+
+    init {
+        register(MagicSkill("float","Horizontal_Line", costEnergy = 5.0) { skillData ->
+            skillData.skillMeta["power"] = 0.5
+            PuffTower.skillManager["float"]?.invoke(skillData)
+            SkillResult.SUCCESS
+        })
+    }
+
+    fun getAvailableSkills(player: Player): List<MagicSkill> {
+        return player.getAttrData()?.getAttrValue<String>("MagicSkills")?.split(", ")?.mapNotNull {
+            get(it)
+        }?:emptyList()
     }
 
     val eventNode = EventNode.all("ShapeRecognizer")
@@ -91,9 +105,18 @@ object CastManager {
             data.clear()
             return
         }
+        val availableSkills = getAvailableSkills(player)
+        val shapes = availableSkills.map { it.shape }.toSet()
         val recognizer = ShapeRecognizer()
-        val shape = recognizer.recognize(data)
+        val shape = recognizer.recognize(data,shapes)
         player.showTitle(Title.title("§6$shape".colored(),"§7(${data.size} points)".colored()))
+        val skillToCast = availableSkills.first { it.shape==shape }
+        if(player.isSneaking) {
+            skillToCast.cast(player, listOf(Target(player)))
+        } else {
+            player.sendMessage("§e挥动法杖释放技能 §6$shape§e !".colored())
+            player.setTagExpire(SKILL_TO_CAST_TAG,skillToCast.key,40)
+        }
         data.clear()
         player.removeTag(shapeData)
         player.removeTag(startDirection)

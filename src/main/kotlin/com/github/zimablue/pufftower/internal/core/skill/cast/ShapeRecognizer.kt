@@ -7,42 +7,46 @@ data class Pt(val x: Double, val y: Double)
 data class Template(val name: String, val points: List<Pt>)
 
 class ShapeRecognizer(
-    val squareSize: Double = 250.0,       // 归一化尺度方框大小
-    val resampleCount: Int = 32,          // 重采样点数（64足够稳定）
-    val angleRange: Double = Math.PI / 4, // 允许旋转搜索的角范围（±45°）
-    val anglePrecision: Double = Math.toRadians(2.0), // 搜索精度（2°）
-    val minScore: Double = 0.60           // 最低可接受得分，低于则认为未知
+    private val squareSize: Double = 250.0,       // 归一化尺度方框大小
+    private val resampleCount: Int = 32,          // 重采样点数（64足够稳定）
+    private val angleRange: Double = Math.PI / 4, // 允许旋转搜索的角范围（±45°）
+    private val anglePrecision: Double = Math.toRadians(2.0), // 搜索精度（2°）
+    private val minScore: Double = 0.60           // 最低可接受得分，低于则认为未知
 ) {
 
-    val templates = mutableMapOf<String,Template>()
+    private val templates = mutableMapOf<String,Template>()
     private val halfDiagonal = 0.5 * hypot(squareSize, squareSize)
     private val phi = 0.5 * (sqrt(5.0) - 1.0) // 黄金分割常数 ≈ 0.618
 
     init {
         // 预置模板
-//        addTemplate("Circle", CIRCLE)
-//        addTemplate("Triangle", TRIANGLE)
-//        addTemplate("Square", SQUARE)
+        addTemplate("Circle", CIRCLE(resampleCount))
+        addTemplate("Triangle", TRIANGLE)
+        addTemplate("Square", SQUARE)
+        addTemplate("HorizontalLine", HORIZONTAL_LINE)
+        addTemplate("Heart", HEART(resampleCount))
+        addTemplate("Caret", CARET)
+        addTemplate("InvertedCaret", INVERTED_CARET)
+        addTemplate("Diamond", DIAMOND)
     }
 
     companion object {
         // ========= 预置模板 =========
 
-        val CIRCLE:(recognizer: ShapeRecognizer) -> List<Pt> = { recognizer: ShapeRecognizer ->
-            val n = recognizer.resampleCount
+        fun CIRCLE(resampleCount: Int): List<Pt> {
             val r = 100.0
             val cx = 0.0
             val cy = 0.0
-            val list = ArrayList<Pt>(n)
-            val total = n - 1 // 闭合
+            val list = ArrayList<Pt>(resampleCount)
+            val total = resampleCount - 1 // 闭合
             for (i in 0..total) {
                 val a = 2.0 * Math.PI * i / total
                 list.add(Pt(cx + r * cos(a), cy + r * sin(a)))
             }
-            list
+            return list
         }
 
-        val TRIANGLE:(recognizer: ShapeRecognizer) -> List<Pt> = { recognizer: ShapeRecognizer ->
+        val TRIANGLE: List<Pt> by lazy {
             // 等边三角形，绕边一笔画闭合
             val s = 200.0
             val h = s * sqrt(3.0) / 2.0
@@ -52,7 +56,7 @@ class ShapeRecognizer(
             listOf(a, b, c, a)          // 闭合
         }
 
-        val SQUARE:(recognizer: ShapeRecognizer) -> List<Pt> = { recognizer: ShapeRecognizer ->
+        val SQUARE: List<Pt> by lazy {
             val s = 200.0
             val half = s / 2.0
             val p1 = Pt(-half, -half)
@@ -61,10 +65,60 @@ class ShapeRecognizer(
             val p4 = Pt(-half, half)
             listOf(p1, p2, p3, p4, p1) // 闭合
         }
+
+        val HORIZONTAL_LINE: List<Pt> by lazy {
+            val s = 200.0
+            val half = s / 2.0
+            val p1 = Pt(-half, 0.0)
+            val p2 = Pt(half, 0.0)
+            listOf(p1, p2) // 不闭合
+        }
+
+        // 心形：使用经典参数方程采样（点数由 resampleCount 决定）
+        fun HEART(resampleCount: Int): List<Pt> {
+            val k = 6.5 // 缩放系数，使整体尺寸与其它模板相近
+            val list = ArrayList<Pt>(resampleCount)
+            val total = resampleCount - 1
+            for (i in 0..total) {
+                val t = 2.0 * Math.PI * i / total
+                val x = 16.0 * sin(t).pow(3.0)
+                val y = 13.0 * cos(t) - 5.0 * cos(2.0 * t) - 2.0 * cos(3.0 * t) - cos(4.0 * t)
+                list.add(Pt(k * x, -k * y)) // 取负 y 让心形尖朝下（视觉更常见）
+            }
+            return list
+        }
+
+        // 正角（形似 ^）：三个点，不闭合
+        val CARET: List<Pt> by lazy {
+            val s = 200.0
+            val half = s / 2.0
+            listOf(
+                Pt(-half, half / 2.0), // 左底
+                Pt(0.0, -half),        // 顶点
+                Pt(half, half / 2.0)   // 右底
+            )
+        }
+
+        // 倒角（形似 V）：正角上下反转
+        val INVERTED_CARET: List<Pt> by lazy {
+            CARET.map { Pt(it.x, -it.y) }
+        }
+
+        // 菱形：四个角并闭合
+        val DIAMOND: List<Pt> by lazy {
+            val s = 200.0
+            val half = s / 2.0
+            val top = Pt(0.0, -half)
+            val right = Pt(half, 0.0)
+            val bottom = Pt(0.0, half)
+            val left = Pt(-half, 0.0)
+            listOf(top, right, bottom, left, top)
+        }
+
     }
 
     // 对外主接口：输入 List<Pair<Double, Double>>，输出图形类型中文字符串
-    fun recognize(raw: List<Pair<Double, Double>>): String {
+    fun recognize(raw: List<Pair<Double, Double>>, useTemplates: Set<String> = emptySet()): String {
         if (raw.size < 3) return "未知"
         val pts = raw.map { Pt(it.first, it.second) }
         // 如果路径长度过短，直接未知
@@ -76,6 +130,7 @@ class ShapeRecognizer(
         var bestName = "未知"
 
         for ((name,tpl) in templates) {
+            if(useTemplates.isNotEmpty() && name !in useTemplates) continue
             val d = distanceAtBestAngle(candidate, tpl.points, -angleRange, angleRange, anglePrecision)
             if (d < bestDist) {
                 bestDist = d
@@ -91,10 +146,6 @@ class ShapeRecognizer(
         val processed = normalize(rawPoints)
         templates[name] = Template(name, processed)
         return this
-    }
-
-    fun addTemplate(name: String, points: (ShapeRecognizer) -> List<Pt>) :ShapeRecognizer {
-        return addTemplate(name, points(this))
     }
 
     fun removeTemplate(name: String) : ShapeRecognizer{

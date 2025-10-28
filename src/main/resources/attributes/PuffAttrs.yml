@@ -27,3 +27,9 @@
 AttackRange:
   names:
     - "攻击范围"
+MaxEnergy:
+  names:
+    - "最大能量"
+MagicSkills:
+  names:
+    - "法术技能"

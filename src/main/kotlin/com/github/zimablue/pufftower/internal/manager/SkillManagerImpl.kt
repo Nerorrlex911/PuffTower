@@ -99,6 +99,19 @@ object SkillManagerImpl: SkillManager() {
             }
             SkillResult.SUCCESS
         }
+        /*
+        使目标漂浮
+         */
+        register("float") {
+            val power = (skillMeta["power"] as? Number)?.toDouble() ?: 0.5
+            inheritedTargets.forEach { target ->
+                if(target.isEntity) {
+                    val entity = target.entityTarget ?: return@forEach
+                    entity.velocity = entity.velocity.withY(power)
+                }
+            }
+            SkillResult.SUCCESS
+        }
 
     }
 }
