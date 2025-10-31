@@ -3,20 +3,17 @@ package com.github.zimablue.pufftower
 import com.github.zimablue.attrsystem.AttributeSystem
 import com.github.zimablue.devoutserver.DevoutServer
 import com.github.zimablue.devoutserver.plugin.Plugin
+import com.github.zimablue.devoutserver.plugin.lang.PluginLangManager
 import com.github.zimablue.devoutserver.plugin.script.PluginScriptManager
 import com.github.zimablue.pufftower.api.manager.*
 import com.github.zimablue.pufftower.internal.core.command.PuffTowerCommand
-import com.github.zimablue.pufftower.internal.core.dungeon.feature.WeaponFeature
 import com.github.zimablue.pufftower.internal.core.skill.cast.MagicSkillManagerImpl
 import com.github.zimablue.pufftower.internal.manager.*
-import net.kyori.adventure.text.format.NamedTextColor
 import net.minestom.server.MinecraftServer
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.Player
 import net.minestom.server.event.EventNode
-import net.minestom.server.event.entity.EntityTickEvent
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent
-import net.minestom.server.event.player.PlayerHandAnimationEvent
 import net.minestom.server.instance.Instance
 import net.minestom.server.instance.LightingChunk
 import net.minestom.server.instance.anvil.AnvilLoader
@@ -32,9 +29,7 @@ object PuffTower : Plugin() {
     val featureManager: FeatureManager = FeatureManagerImpl
     val scriptManager: PluginScriptManager = PluginScriptManager(this)
     val itemManager: ItemManager = ItemManagerImpl
-    val skillManager: SkillManager = SkillManagerImpl
-    val selectorManager: SelectorManager = SelectorManagerImpl
-    val conditionManager: ConditionManager = ConditionManagerImpl
+
     val cooldownManager: CooldownManager = CooldownManagerImpl
     val magicSkillManager: MagicSkillManager = MagicSkillManagerImpl
 

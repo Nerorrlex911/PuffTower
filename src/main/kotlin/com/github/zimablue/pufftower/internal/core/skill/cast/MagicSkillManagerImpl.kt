@@ -6,7 +6,6 @@ import com.github.zimablue.devoutserver.plugin.lifecycle.PluginLifeCycle
 import com.github.zimablue.devoutserver.util.colored
 import com.github.zimablue.pufftower.PuffTower
 import com.github.zimablue.pufftower.api.manager.MagicSkillManager
-import com.github.zimablue.pufftower.internal.core.skill.SkillData
 import com.github.zimablue.pufftower.internal.core.skill.SkillResult
 import com.github.zimablue.pufftower.internal.core.skill.Target
 import com.github.zimablue.pufftower.util.setTagExpire
@@ -30,11 +29,6 @@ object MagicSkillManagerImpl : MagicSkillManager() {
     val SKILL_TO_CAST_TAG = Tag.String("skill_to_cast")
 
     init {
-        register(MagicSkill("float","Horizontal_Line", costEnergy = 5.0) { skillData ->
-            skillData.skillMeta["power"] = 0.5
-            PuffTower.skillManager["float"]?.invoke(skillData)
-            SkillResult.SUCCESS
-        })
     }
 
     fun getAvailableSkills(player: Player): List<MagicSkill> {
