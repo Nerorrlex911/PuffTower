@@ -32,6 +32,7 @@ object PuffTower : Plugin() {
 
     val cooldownManager: CooldownManager = CooldownManagerImpl
     val magicSkillManager: MagicSkillManager = MagicSkillManagerImpl
+    val langManager: PluginLangManager = PluginLangManager(this)
 
     lateinit var instance: Instance
 
